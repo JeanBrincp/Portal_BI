@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home - Portal PMI{% endblock %}
+
+{% block content %}
+<div class="layout">
+  <div class="sidebar">
+    <img class='logo' src="{% static '/img/PMI - logo negativo horizontal.png' %}" alt="Logo PMI">
+    <h2>Portal de Dashboards PMI</h2  >
+    <a href="{% url 'home' %}">🏠 Home</a>
+    <a href="{% url 'dashboards' %}">📊 Dashboards</a>
+    {% if user.is_staff %}
+      <a href="{% url 'admin:index' %}">⚙️ Admin</a>
+    {% endif %}
+    <a href="#">⚙️ Configurações</a>
+    <a href="#">👤 Usuário</a>
+    <a href="#">ℹ️ Sobre</a>
+    <a href="{% url 'logout' %}">🚪 Sair</a>
+  </div>
+
+  <div class="content">
+    <h1>BI - Ouvidoria</h1>
+    <div class="content-box"></div>
+  </div>
+</div>
+{% endblock %}

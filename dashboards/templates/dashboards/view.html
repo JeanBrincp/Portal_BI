@@ -1,0 +1,11 @@
+{# Idealmente, este template estenderia um base.html #}
+
+<a href="{% url 'dashboards:home' %}">&larr; Voltar para a lista</a>
+
+<h1>{{ dashboard.nome }}</h1>
+
+{% if dashboard.descricao %}
+<p>{{ dashboard.descricao }}</p>
+{% endif %}
+
+<iframe src="{{ dashboard.url }}" frameborder="0" width="100%" height="800px" allowfullscreen></iframe>

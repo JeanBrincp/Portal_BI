@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <label for="user">Selecione o Usuário:</label>
+        <select name="user" id="user" required>
+            <option value="">---------</option>
+            {% for u in users %}
+            <option value="{{ u.id }}">{{ u.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <br>
+    <div class="form-row">
+        <label>Selecione os Dashboards:</label>
+        <div style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
+            {% for dash in dashboards %}
+            <div>
+                <input type="checkbox" name="dashboards" value="{{ dash.id }}" id="dash_{{ dash.id }}">
+                <label for="dash_{{ dash.id }}">{{ dash.nome }}</label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <br>
+    <div class="submit-row">
+        <input type="submit" value="Salvar Permissões">
+    </div>
+</form>
+{% endblock %}

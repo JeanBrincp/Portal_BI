@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>Meus Dashboards</h1>
+  {% if dashboards %}
+    <ul>
+      {% for dashboard in dashboards %}
+        <li><a href="{{ dashboard.id }}/">{{ dashboard.nome }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Você não tem permissão para ver nenhum dashboard.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Portal de Dashboards PMI{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  {% block content %}{% endblock %}
+
+  <!-- AI Assistant Chat Bubble -->
+  <div class="chat-bubble" id="chat-bubble">
+    <img src="{% static 'img/Ibi_tchau.png' %}" alt="Assistente">
+  </div>
+
+  <!-- AI Assistant Chat Window -->
+  <div class="chat-window" id="chat-window">
+    <div class="chat-header">
+      <h3>Assistente Virtual</h3>
+      <button id="close-chat">X</button>
+    </div>
+          <div class="chat-body" id="chat-body">
+            <!-- Messages will appear here -->
+            <div class="chat-message bot" id="ibi-greeting">
+              <!-- Greeting is set by script -->
+            </div>
+          </div>
+          <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+            <button id="send-chat">Enviar</button>
+          </div>
+        </div>
+    
+        <script>
+          const chatBubble = document.getElementById('chat-bubble');
+          const chatWindow = document.getElementById('chat-window');
+          const closeChat = document.getElementById('close-chat');
+          const chatBody = document.getElementById('chat-body');
+          const chatInput = document.getElementById('chat-input');
+          const sendChatBtn = document.getElementById('send-chat');
+          const ibiGreeting = document.getElementById('ibi-greeting');
+    
+          // On page load, set the correct greeting
+          document.addEventListener('DOMContentLoaded', function() {
+              if (sessionStorage.getItem('ibi_interacted')) {
+                  ibiGreeting.textContent = 'Olá novamente! Como posso te ajudar agora?';
+              } else {
+                  ibiGreeting.textContent = 'Olá, Meu nome e Ibi ! Como posso ajudar você hoje?';
+              }
+          });
+      
+          // Function to get CSRF token
+          function getCookie(name) {
+              let cookieValue = null;
+              if (document.cookie && document.cookie !== '') {
+                  const cookies = document.cookie.split(';');
+                  for (let i = 0; i < cookies.length; i++) {
+                      const cookie = cookies[i].trim();
+                      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                      }
+                  }
+              }
+              return cookieValue;
+          }
+          const csrftoken = getCookie('csrftoken');
+      
+      
+          chatBubble.addEventListener('click', () => {
+            chatWindow.style.display = 'flex';
+            chatBubble.style.display = 'none';
+          });
+      
+          closeChat.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+            chatBubble.style.display = 'flex';
+          });
+      
+          const sendMessage = () => {
+            const message = chatInput.value.trim();
+            if (message === '') return;
+    
+            // Set interaction flag in session storage
+            sessionStorage.setItem('ibi_interacted', 'true');
+      
+            // Display user message
+            const userMessageElem = document.createElement('div');
+            userMessageElem.classList.add('chat-message', 'user');
+            userMessageElem.textContent = message;
+            chatBody.appendChild(userMessageElem);
+            chatInput.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+      
+            // Send message to backend
+            fetch("{% url 'ask_ai' %}", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+              },
+              body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+              let responseText = data.response || data.error || 'Ocorreu um erro.';
+              let navCommand = null;
+      
+              // Try to find a JSON object within the response text
+              const jsonMatch = responseText.match(/{.*}/);
+              if (jsonMatch) {
+                  try {
+                      const potentialJson = JSON.parse(jsonMatch[0]);
+                      if (potentialJson.action === 'navigate' && potentialJson.url) {
+                          navCommand = potentialJson;
+                      }
+                  } catch (e) {
+                      // Not a valid JSON, so we'll just treat it as plain text
+                  }
+              }
+      
+              if (navCommand) {
+                  // It's a navigation command
+                  const botMessageElem = document.createElement('div');
+                  botMessageElem.classList.add('chat-message', 'bot');
+                  botMessageElem.textContent = 'Ok, estou te redirecionando para o dashboard solicitado...';
+                  chatBody.appendChild(botMessageElem);
+                  chatBody.scrollTop = chatBody.scrollHeight;
+      
+                  setTimeout(() => {
+                      window.location.href = navCommand.url;
+                  }, 1000);
+              } else {
+                  // It's a regular text response
+                  const botMessageElem = document.createElement('div');
+                  botMessageElem.classList.add('chat-message', 'bot');
+                  botMessageElem.textContent = responseText;
+                  chatBody.appendChild(botMessageElem);
+                  chatBody.scrollTop = chatBody.scrollHeight;
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              const errorMessageElem = document.createElement('div');
+              errorMessageElem.classList.add('chat-message', 'bot');
+              errorMessageElem.textContent = 'Não foi possível conectar ao assistente.';
+              chatBody.appendChild(errorMessageElem);
+              chatBody.scrollTop = chatBody.scrollHeight;
+            });
+          };
+      
+          sendChatBtn.addEventListener('click', sendMessage);
+          chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              sendMessage();
+            }
+          });
+        </script>
+</body>
+</html>

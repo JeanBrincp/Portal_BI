@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Portal PMI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="login-page-container">
+    <!-- Background image -->
+    <img
+      src="{% static 'img/ibirite.jpg' %}"
+      alt="Fundo"
+      class="login-bg-image"
+    />
+
+    <!-- Dark overlay -->
+    <div class="login-overlay"></div>
+
+    <!-- Central card -->
+    <div class="login-card">
+      <h2 class="login-title">Bem-vindo</h2>
+      <p class="login-subtitle">Acesse o Portal BI PMI</p>
+
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        <input type="text" placeholder="Usuário" name="username" class="login-input" required>
+        <input type="password" placeholder="Senha" name="password" class="login-input" required>
+        
+        <button type="submit" class="login-button">
+          Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends "admin/index.html" %}
+{% block content %}
+{{ block.super }}
+<div class="app-list">
+    <div class="app-dashboards module">
+        <table>
+            <caption>
+                <a href="#" class="section" title="Ferramentas Customizadas">Ferramentas Customizadas</a>
+            </caption>
+            <tbody>
+                <tr class="model-permissaodashboard">
+                    <th scope="row">
+                        <a href="{% url 'grant_bulk_permissions' %}">Conceder Permissões de Dashboard em Massa</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
