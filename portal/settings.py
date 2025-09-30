@@ -30,7 +30,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']  # Temporário para testes
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-ALLOWED_HOSTS = ['172.17.48.39', '127.0.0.1', 'localhost', 'https://lemon-numbers-wonder.loca.lt']
+ALLOWED_HOSTS = ['172.17.48.39', '127.0.0.1', 'localhost']
 
 
 # Application definition
